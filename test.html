@@ -29,6 +29,14 @@ function renderJSON(el, value) {
   } catch {
     el.textContent = JSON.stringify({ error: "Failed to serialize output" });
   }
+ 
+  window.parent.postMessage(
+    {
+      type: "reddit-output",
+      payload: data
+    },
+    "*"
+  );
 }
 
 (async () => {
