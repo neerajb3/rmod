@@ -33,7 +33,7 @@ function renderJSON(el, value) {
   window.parent.postMessage(
     {
       type: "reddit-output",
-      payload: data
+      payload: value
     },
     "*"
   );
