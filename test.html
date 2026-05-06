@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Reddit Moderated Subreddits</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    pre {
+      background: #111;
+      color: #0f0;
+      padding: 10px;
+      overflow: auto;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Moderated Subreddits Viewer</h2>
+<p>Usage: add <code>#username</code> to the URL</p>
+
+<pre id="output"></pre>
+
+<script>
+function renderJSON(el, value) {
+  try {
+    el.textContent = JSON.stringify(value);
+  } catch {
+    el.textContent = JSON.stringify({ error: "Failed to serialize output" });
+  }
+}
+
+(async () => {
+  const output = document.getElementById("output");
+
+  // Always valid JSON, even for initial state
+  renderJSON(output, { status: "loading" });
+
+  const username = location.hash.slice(1);
+
+  if (!username) {
+    renderJSON(output, { error: "No username provided. Use #username in the URL." });
+    return;
+  }
+
+  const url = `https://www.reddit.com/user/${username}/moderated_subreddits.json`;
+
+  try {
+    const res = await fetch(url);
+
+    let data;
+    try {
+      data = await res.json();
+    } catch {
+      const text = await res.text();
+      data = { error: "Response was not JSON", raw: text };
+    }
+
+    console.log(data);
+    renderJSON(output, data);
+
+  } catch (err) {
+    console.error(err);
+    renderJSON(output, { error: err.message });
+  }
+})();
+</script>
+
+</body>
+</html>
